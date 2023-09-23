@@ -1,0 +1,87 @@
+# Performance test focuses into measuring the times
+# of the most commonly used operations in the API.
+# For simplicity (to avoid multiple users addition, etc),
+# we have omitted user deletion as this is a rare operation,
+# but it can be easily added to the scenarios.
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 10
+      arrivalRate: 10
+  processor: "./performance-helper.js"
+  plugins:
+    metrics-by-endpoint:
+      # Group metrics by request name rather than URL.
+      # To focus per-scenario, set this to false.
+      useOnlyRequestNames: true
+ 
+scenarios:
+  - name: "Check API"
+    flow:
+      - get:
+          url: "/"
+
+  - name: "Register User"
+    arrivalRate: 1
+    flow:
+      - post:
+          url: "/users/register"
+          beforeRequest: generateSignupData
+          json:
+            name: "{{ name }}"
+            email: "{{ email }}"
+            password: "{{ password }}"
+            role: "{{ role }}"
+            address: "{{ address }}"
+
+  - name: "Login user and apply multiple order actions"
+    flow:
+      - post:
+          url: "/users/login"
+          beforeRequest: generateLoginData
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.accessToken"
+              as: "accessToken"
+
+      # Order placement.
+      - post:
+          url: "/order"
+          beforeRequest: generateOrderData
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'
+          json:
+            type: "{{ type }}"
+            description: "{{ description }}"
+          capture:
+            - json: "$._id"
+              as: "orderID"
+
+      # Access actions.
+      - get:
+          url: "/users"
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'
+
+      - get:
+          url: "/orders"
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'
+
+      # Modification/Deletion Actions.
+      - put:
+          url: "/order"
+          beforeRequest: generateUpdatedOrderData
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'
+          json:
+            _id: "{{ orderID }}"
+            type: "{{ type }}"
+            description: "{{ description }}"
+       
+      - delete:
+          url: "/order/{{ orderID }}"
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'

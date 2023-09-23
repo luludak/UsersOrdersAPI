@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  st-sample:
+    container_name: st-sample
+    image: sample
+    restart: always
+    build: .
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    links:
+      - mongo
+    networks:
+      - mynetwork
+    
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - /sampledb
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    external: true
