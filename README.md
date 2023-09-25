@@ -1,4 +1,4 @@
-# Sample User & Order Management Service API
+# Basic User & Order Management Service API
 
 *Disclaimer: I Implemented and published this as the sample, walkthrough project for the Software Testing Course at the University of Edinburgh. It intended intended to be a walkthrough to students for software development and testing.
 It was initially distributed on UoE Gitlab server (the CI/CD tests were setup to run there), but was always publicly available. Adding it here for archiving and demonstrational purposes, and, although I believe it to be fully functional and thoroughly tested, it is **provided as-is, with no guarantees**.*
