@@ -1,0 +1,6 @@
+BASE_URL="http://st-sample"
+PORT=3000
+URL_POSTFIX=""
+API_SECRET="ThisIsAnAPISecret"
+TEST_FLAG=true
+DB_ENDPOINT="mongodb://mongo:27017/sampledb"
