@@ -1,7 +1,6 @@
 # Basic User & Order Management Service API
 
-*Disclaimer: I Implemented and published this as the sample, walkthrough project for the Software Testing Course at the University of Edinburgh. It intended intended to be a walkthrough to students for software development and testing.
-It was initially distributed on UoE Gitlab server (the CI/CD tests were setup to run there), but was always publicly available. Adding it here for archiving and demonstrational purposes, and, although I believe it to be fully functional and thoroughly tested, it is **provided as-is, with no guarantees**.*
+*Disclaimer: I Implemented and published this as the sample, walkthrough project for the Software Testing Course at the University of Edinburgh. It is a walkthrough to students for software development and testing. It is also distributed on UoE Gitlab server (the CI/CD tests were setup to run there), and is publicly available there. Although I believe it to be fully functional and thoroughly tested, it is **provided as-is, with no guarantees**.*
 
 The project exposes an API related to operations regarding User registration, authentication and usage, allowing a simple order placement of predefined boxes of an imaginary food shop under a limited amount of choices (`Box1` and `Box2`). The system also poses different user access levels (`Admin` and `User`), with elevated permissions to the administrator and respective restrictions to the simple user.
 
