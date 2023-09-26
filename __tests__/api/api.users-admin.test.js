@@ -94,12 +94,13 @@ describe("Admin User Tests", () => {
       expect(error.response.status).toEqual(403);
     });
   });
+  
+  // Other potential cases for testing. Leaving this as TODO.
+  // it("should update credentials", async () => {
+  //   expect(true).toEqual(true);
+  // });
 
-  it("should update credentials", async () => {
-    expect(true).toEqual(true);
-  });
-
-  it("should fail updating credentials of another user", async () => {
-    expect(true).toEqual(true);
-  });
+  // it("should fail updating credentials of another user", async () => {
+  //   expect(true).toEqual(true);
+  // });
 });
