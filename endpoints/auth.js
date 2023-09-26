@@ -21,7 +21,12 @@ const authenticateToken = (req, res, next) => {
     }
 
     User.findOne({_id: user.id}).then(userFound => {
-      user.role = userFound.role;
+      // If the token does not belong to an existing user,
+      // then block access.
+      if (!userFound) {
+        return res.status(403).send({"message": "Unauthorized access."});
+      }
+      user.role = {userFound};
       req.user = user;
       next();
     });
