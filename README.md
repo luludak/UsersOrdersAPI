@@ -1,24 +1,22 @@
-# Basic User & Order Management Service API
+# Software Testing 2023-24 Sample Project
 
-*Disclaimer: I Implemented and published this as the sample, walkthrough project for the Software Testing Course at the University of Edinburgh. It is a walkthrough to students for software development and testing. It is also distributed on UoE Gitlab server (the CI/CD tests were setup to run there), and is publicly available there. Although I believe it to be fully functional and thoroughly tested, it is **provided as-is, with no guarantees**.*
+**This is the sample test project for Software Testing Course 2023-24 at the University of Edinburgh**.
 
 The project exposes an API related to operations regarding User registration, authentication and usage, allowing a simple order placement of predefined boxes of an imaginary food shop under a limited amount of choices (`Box1` and `Box2`). The system also poses different user access levels (`Admin` and `User`), with elevated permissions to the administrator and respective restrictions to the simple user.
 
 The project is written in JavaScript (utilizing some of ES6 such as destructuring and `async/await` instead of promises, while keeping some of CommonJS traits, such as module loading via `require`), utilizing `Node.js` engine. In addition, `MongoDB` is utilized for the Database, and `Mongoose` package is utilized for usage in the project (DB schema definition, CRUD operations).
 
 The system utilizes `JWT` for authentication and `Bcrypt` for password encryption.
-The system utilizes `Express` package for API buildup.
+The system utilizes `Express` package for API buildup. 
 
-For testing purposes, we utilize `Jest`, giving emphasis to Unit & Integration Tests. Although a UI interface is not included, you can always build a UI on top of the system and utilize additional frameworks for testing, such as `Puppeteer`.
+For testing purposes, we utilize `Jest` for Unit & Integration Tests. Although a UI interface is not included, you can always build a UI on top of the system and utilize additional frameworks for testing, such as `Puppeteer`.
 
 In addition, for performance testing and metrics reporting, we utilize [`Artillery`](https://www.artillery.io/).
 
 ## Prerequisites
-
 [`Node.js`]("https://nodejs.org/en/"), [`MongoDB`]("https://www.mongodb.com/") and `npm` package need to be installed in your system.
 
 ## Setup Instructions
-
 Setup by running `npm install` in the project folder.
 This will generate a `node_modules` folder in your project folder containing all necessary packages.
 Following that, and given you have downloaded and installed `MongoDB`, start it by doing `sudo systemctl start mongod`.
@@ -64,7 +62,6 @@ Once `MongoDB` is initiated, you can start your server by running `node server.j
 ```
 
 ## Run Instructions
-
 Before setting up the project, make sure that MongoDB is setup, by running:
 
 ```
@@ -76,7 +73,7 @@ You can start it by doing `sudo systemctl start mongod`, or stop it by doing `su
 To setup the server locally, run `node server.js`. The project will start.
 You can then setup options such as port in the respective configuration file.
 
-Keep in mind that you will need to use the _local_ configuration, therefore it is recommended
+Keep in mind that you will need to use the *local* configuration, therefore it is recommended
 thet you rename `.env.local` file to `.env` (discarding or renaming the existing `.env` file which relates to CI), configure your system so that it utilizes `.env.local` before you start the server locally or ignore local changes on `.env`file and rename the `.env.local`.
 
 To execute Unit/Integration tests, run `npm test`.
@@ -89,20 +86,17 @@ To generate a report of performance results after their run, you can run `npm ru
 This will automatically generate an `html` file, visually presenting the results in diagrams and statistics.
 
 ## Configuration
-
 You can configure a certain number of parameters, such as system port and auth key secret at your `.env` configuration file.
 
 ## DB Cleanup
-
 The test suite contains setup and teardown logic, leaving the database in a clean state after each run.
 
 However, in case you ended up with a database containing unwanted test entries, you can clean it all up by running `node db-cleanup.js`.
 
 ## Continuous Integration
-
 In order to setup the application for Continuous Integration tests execution (which are all tests, excluding the ones for performance), we have included some Docker files related to it to the project. However, you need to make a number of steps in order to prepare your project to CI/CD. We used `Gitlab CI` in order to do so, but you are free to choose another technology in case you want to do so:
 
-_Disclaimer: All actions are proposed in order to setup the project and are just suggestions. Since they require applying sudo permissions to processes. Use at your own risk and discretion. It is highly recommended not to do it on any device containing sensitive data._
+*Disclaimer: All actions are proposed in order to setup the project and are just suggestions. Since they require applying sudo permissions to processes. Use at your own risk and discretion. It is highly recommended not to do it on any device containing sensitive data.*
 
 1. Clone the project to a new Gitlab repository.
 2. Enable CI/CD in your project. You can find directions [here](https://docs.gitlab.com/ee/ci/enable_or_disable_ci.html).

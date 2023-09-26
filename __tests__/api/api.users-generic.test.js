@@ -5,14 +5,23 @@ const {prepare} = require("../setup/test-helper");
 describe("Generic User Tests", () => {
 
   let adminLogin = null;
+  let genericConfig = null;
 
   beforeAll(async () => {
     // Login admin user.
 
-    adminLogin = await axios.post(prepare("/users/login/"), {
+    adminLogin = await axios.post(prepare("/login"), {
       email: "test@test.com",
       password: "12345"
     });
+
+    const {accessToken} = adminLogin.data;
+
+    // Note we use JWT authentication for the API,
+    // therefore we need to authenticate our request for the test.
+    genericConfig = {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    } 
   });
 
   it("should check system is on", async () => {
@@ -22,18 +31,19 @@ describe("Generic User Tests", () => {
 
 
   it("should login user", async () => {
-    const userLogin = await axios.post(prepare("/users/login/"), {
+    const userLogin = await axios.post(prepare("/login"), {
       email: "testuser@test.com",
       password: "12345"
     });
+
     const {accessToken} = userLogin.data;
     expect(userLogin.status).toEqual(200);
-    expect(accessToken).not.toEqual(null);
+    expect(accessToken).not.toEqual(undefined);
   });
 
 
   it("should fail to login user (wrong password)", async () => {
-    await axios.post(prepare("/users/login/"), {
+    await axios.post(prepare("/login"), {
       email: "testuser@test.com",
       password: "1234567"
     }).catch((error) => {
@@ -46,20 +56,20 @@ describe("Generic User Tests", () => {
   });
 
   it("should hit random endpoint", async () => {
-    await axios.get(prepare("/user/something")).catch(error => {
+    await axios.get(prepare("/randomurl/something")).catch(error => {
       // 401 - Unauthorized Access
       expect(error.response.status).toEqual(404);
     });
   });
 
-  it("should fail unauthorized Access actions", async () => {
+  it("should fail unauthorized access actions", async () => {
 
     await axios.get(prepare("/users")).catch(error => {
       // 401 - Unauthorized Access
       expect(error.response.status).toEqual(401);
     });
   
-    await axios.get(prepare("/orders")).catch(error => {
+    await axios.get(prepare("/orders/all")).catch(error => {
       // 401 - Unauthorized Access
       expect(error.response.status).toEqual(401);
     });
@@ -93,7 +103,7 @@ describe("Generic User Tests", () => {
       expect(error.response.status).toEqual(401);
     });
 
-    await axios.put(prepare("/user"), {
+    await axios.put(prepare("/me"), {
       "name": "ShouldNotUpdate"
     }).catch(error => {
       // 401 - Unauthorized Access
@@ -111,7 +121,7 @@ describe("Generic User Tests", () => {
   });
 
   it("should register user", async () => {
-    const response = await axios.post(prepare("/users/register"), {
+    const response = await axios.post(prepare("/register"), {
       "name": "User New",
       "role": "User",
       "email": "testusernew@test.com",
@@ -124,7 +134,7 @@ describe("Generic User Tests", () => {
   it("should fail to register user (existing email)", async () => {
 
     
-    const response = await axios.post(prepare("/users/register"), {
+    const response = await axios.post(prepare("/register"), {
       "name": "User New",
       "role": "User",
       "email": "testuserbrandnew@test.com",
@@ -134,7 +144,7 @@ describe("Generic User Tests", () => {
 
     expect(response.status).toEqual(201);
 
-    await axios.post(prepare("/users/register"), {
+    await axios.post(prepare("/register"), {
       "name": "User New",
       "role": "User",
       "email": "testuserbrandnew@test.com",
@@ -149,7 +159,7 @@ describe("Generic User Tests", () => {
   });
 
   it("should fail to register user (malformed email)", async () => {
-    await axios.post(prepare("/users/register"), {
+    await axios.post(prepare("/register"), {
       "name": "User New",
       "role": "User",
       "email": "testuseranothernew",
@@ -161,7 +171,7 @@ describe("Generic User Tests", () => {
   });
 
   it("should fail to register user (no password)", async () => {
-    await axios.post(prepare("/users/register"), {
+    await axios.post(prepare("/register"), {
       "name": "User New",
       "role": "User",
       "email": "testuseranothernew2@test.com",
@@ -172,7 +182,7 @@ describe("Generic User Tests", () => {
   });
 
   it("should fail to register user (no name)", async () => {
-    await axios.post(prepare("/users/register"), {
+    await axios.post(prepare("/register"), {
       "role": "User",
       "email": "testuseranothernew3@test.com",
       "password": "12345",
@@ -183,7 +193,7 @@ describe("Generic User Tests", () => {
   });
 
   it("should fail to register user (no address)", async () => {
-    await axios.post(prepare("/users/register"), {
+    await axios.post(prepare("/register"), {
       "name": "User New",
       "role": "User",
       "email": "testuseranothernew4@test.com",
@@ -192,4 +202,34 @@ describe("Generic User Tests", () => {
       expect(error.response.status).toEqual(400);
     });
   });
+
+  it("should block access by valid auth token of non-existing user", async () => {
+    await axios.post(prepare("/register"), {
+      "name": "UserToDeleteNow",
+      "role": "User",
+      "email": "testtodeletenow@test.com",
+      "password": "12345",
+      "address": "Somewhere 10"
+    });
+
+    userToDeleteNow = await axios.post(prepare("/login/"), {
+      email: "testtodeletenow@test.com",
+      password: "12345"
+    });
+
+    const {accessToken} = userToDeleteNow.data
+    userToDeletegenericConfig = {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    }
+
+    await axios.delete(prepare("/user/" + userToDeleteNow.data.user.id), genericConfig);
+
+    // Attempt to get orders of deleted user, while access token still valid.
+    await axios.get(prepare("/orders/all"), userToDeletegenericConfig).catch(error => {
+      // Unauthorized.
+      expect(error.response.status).toEqual(403);
+    });
+  
+  });
+
 });

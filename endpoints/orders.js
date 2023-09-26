@@ -33,7 +33,7 @@ module.exports = (app) => {
   });
 
   /* Get orders of user. */
-  app.get("/orders", authenticateToken, async (req, res) => {
+  app.get("/orders/all", authenticateToken, async (req, res) => {
     try{
       let allOrders = await Order.find({ user : req.user.id });
       return res.status(200).json(allOrders);
@@ -139,27 +139,6 @@ module.exports = (app) => {
       const orderDeleted = await Order.findByIdAndDelete(orderID);
       return res.status(200).json(orderDeleted);
     } catch(error) {
-      return res.status(400).json({
-        "message": "Bad Request."
-      });
-    }
-  });
-
-  /* Get orders of any user. */
-  app.get("/orders/user/:userID", authenticateToken, async (req, res) => {
-    try {
-
-      // This is an admin-only operation.
-      if(req.user.role !== "Admin") {
-        return res.status(403).json({
-          "message": "Unauthorized Access."
-        });
-      }
-      const {userID} = req.params;
-      const allOrders = await Order.find({user: userID});
-      return res.status(200).json(allOrders);
-    } catch(error) {
-      console.log(error);
       return res.status(400).json({
         "message": "Bad Request."
       });

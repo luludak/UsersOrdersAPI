@@ -26,7 +26,7 @@ const authenticateToken = (req, res, next) => {
       if (!userFound) {
         return res.status(403).send({"message": "Unauthorized access."});
       }
-      user.role = {userFound};
+      user.role = userFound.role;
       req.user = user;
       next();
     });

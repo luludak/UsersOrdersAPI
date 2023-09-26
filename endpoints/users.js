@@ -16,7 +16,7 @@ module.exports = (app) => {
   /****** User Authentication Tasks. ******/
 
   /* Register a new user */
-  app.post("/users/register", async (req, res) => {
+  app.post("/register", async (req, res) => {
   try {
     // TODO: Check if it can be removed.
     // If email is in bad form, return 400.
@@ -47,7 +47,7 @@ module.exports = (app) => {
   });
 
   /* Authenticate a user. */
-  app.post("/users/login", async (req, res) => {
+  app.post("/login", async (req, res) => {
     try{
       User.findOne({ email: req.body.email }).exec((error, user) => {
         if (error) {
@@ -123,7 +123,7 @@ module.exports = (app) => {
   });
 
   /* Get information of any user. */
-  app.get("/users/:userID", authenticateToken, async (req, res) => {
+  app.get("/user/:userID", authenticateToken, async (req, res) => {
     try{
       // This is an admin-only operation.
       if(req.user.role !== "Admin") {
@@ -171,7 +171,7 @@ module.exports = (app) => {
   /* USER TASKS */
 
   /* Get information of self user. */
-  app.get("/user", authenticateToken, async (req, res) => {
+  app.get("/me", authenticateToken, async (req, res) => {
     try {
       const userFound = await User.findOne({ _id: req.user.id });
       return res.status(200).json(userFound);
@@ -184,7 +184,7 @@ module.exports = (app) => {
   });
 
   /* Update information of self user. */
-  app.put("/user", authenticateToken, async (req, res) => {
+  app.put("/me", authenticateToken, async (req, res) => {
     try {
       const userFound = await User.findOne({ _id: req.user.id });
       if(userFound) {
@@ -204,7 +204,7 @@ module.exports = (app) => {
   });
 
   /* Get information of a user. */
-  app.get("/users/:userID", authenticateToken, async (req, res) => {
+  app.get("/user/:userID", authenticateToken, async (req, res) => {
     try{
 
       // This is an admin-only operation.

@@ -5,45 +5,42 @@ const {prepare} = require("../setup/test-helper");
 
 describe("Simple User Tests", () => {
 
-  let config = null;
   let adminLogin = null;
+  let simpleConfig = null;
 
   beforeAll(async () => {
 
     // Login all related users.
 
-    adminLogin = await axios.post(prepare("/users/login/"), {
+    adminLogin = await axios.post(prepare("/login/"), {
       email: "test@test.com",
       password: "12345"
     });
 
-    const login = await axios.post(prepare("/users/login/"), {
+    const login = await axios.post(prepare("/login/"), {
       email: "testuser@test.com",
       password: "12345"
     });
 
     const {accessToken} = login.data;
 
-    config = {
+    simpleConfig = {
         headers: { Authorization: `Bearer ${accessToken}` }
     };
   });
 
   it("should fail to get users", async () => {
-
-    const response = await axios.get(prepare("/users"), config).catch(error => {
+    const response = await axios.get(prepare("/users"), simpleConfig).catch(error => {
       expect(error.response.status).toEqual(403);
     });
-    
   });
 
   it("should update credentials", async () => {
-
-    await axios.put(prepare("/user"), {
+    await axios.put(prepare("/me"), {
       "name": "Updated User"
-    }, config);
+    }, simpleConfig);
 
-    const response = await axios.get(prepare("/user"), config);
+    const response = await axios.get(prepare("/me"), simpleConfig);
 
     const {data} = response;
     expect(data.name).toEqual("Updated User");
@@ -54,7 +51,7 @@ describe("Simple User Tests", () => {
   });
 
   it("should get user orders", async () => {
-    const response = await axios.get(prepare("/orders"), config);
+    const response = await axios.get(prepare("/orders/all"), simpleConfig);
     expect(response.status).toEqual(200);
   });
 
@@ -65,14 +62,14 @@ describe("Simple User Tests", () => {
     await axios.post(prepare("/order"), {
       "type": "Box1",
       "description": "{Test Order}"
-    }, config);
+    }, simpleConfig);
 
-    const allOrdersResponse = await axios.get(prepare("/orders"), config);
+    const allOrdersResponse = await axios.get(prepare("/orders/all"), simpleConfig);
 
     const {data} = allOrdersResponse;
     const firstOrderID = data[0]._id;
 
-    const singleOrderResponse = await axios.get(prepare("/order/" + firstOrderID), config);
+    const singleOrderResponse = await axios.get(prepare("/order/" + firstOrderID), simpleConfig);
     expect(singleOrderResponse.status).toEqual(200);
   });
 
@@ -80,18 +77,18 @@ describe("Simple User Tests", () => {
     // Insert order.
     const insertedResponse = await axios.post(prepare("/order"), {
       "type": "Box2"
-    }, config);
+    }, simpleConfig);
 
     // Update order.
     const updated = await axios.put(prepare("/order/"), {
       "_id": insertedResponse.data._id,
       "type": "Box1",
       "description": "{Test Order Updated}"
-    }, config);
+    }, simpleConfig);
     
 
     // Get previously inserted object and check.
-    const orderResponse = await axios.get(prepare("/order/") + insertedResponse.data._id, config);
+    const orderResponse = await axios.get(prepare("/order/") + insertedResponse.data._id, simpleConfig);
     const {data} = orderResponse;
     
     
@@ -104,26 +101,26 @@ describe("Simple User Tests", () => {
     const insertedOrderResponse = await axios.post(prepare("/order"), {
       "type": "Box2",
       "description": "{Test Order}"
-    }, config);
+    }, simpleConfig);
 
     const {data} = insertedOrderResponse;
     
-    await axios.delete(prepare("/order/" + data._id), config);
-    await axios.get(prepare("/order/" + data._id), config).catch(error => {
+    await axios.delete(prepare("/order/" + data._id), simpleConfig);
+    await axios.get(prepare("/order/" + data._id), simpleConfig).catch(error => {
       expect(error.response.status).toEqual(404);
     });
 
   });
 
   it("should fail to access orders of another user", async () => {
-    await axios.get(prepare("/orders/user/" + adminLogin.data.user.id), config).catch(error => {
+    await axios.get(prepare("/orders/user/" + adminLogin.data.user.id), simpleConfig).catch(error => {
       // Unauthorized
       expect(error.response.status).toEqual(403);
     });
   });
 
   it("should fail deleting a user", async () => {
-    await axios.delete(prepare("/user/" + adminLogin.data.user.id), config).catch(error => {
+    await axios.delete(prepare("/user/" + adminLogin.data.user.id), simpleConfig).catch(error => {
       // Unauthorized
       expect(error.response.status).toEqual(403);
     });
