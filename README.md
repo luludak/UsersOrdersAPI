@@ -1,6 +1,6 @@
-# Software Testing 2023-24 Sample Project
+# Software Testing 2024-25 Sample Project
 
-**This is the sample test project for Software Testing Course 2023-24 at the University of Edinburgh**.
+**This is the sample test project for Software Testing Course 2024-25 at the University of Edinburgh**.
 
 The project exposes an API related to operations regarding User registration, authentication and usage, allowing a simple order placement of predefined boxes of an imaginary food shop under a limited amount of choices (`Box1` and `Box2`). The system also poses different user access levels (`Admin` and `User`), with elevated permissions to the administrator and respective restrictions to the simple user.
 
@@ -100,10 +100,32 @@ In order to setup the application for Continuous Integration tests execution (wh
 
 1. Clone the project to a new Gitlab repository.
 2. Enable CI/CD in your project. You can find directions [here](https://docs.gitlab.com/ee/ci/enable_or_disable_ci.html).
-3. Register a Gitlab Runner in a machine you wish to run it. Once again, you can follow the instructions provided in the [official Gitlab documentation](https://docs.gitlab.com/runner/register/).
-4. Grant elevated permissions to the runner by modifying the `config.toml` file and setting `privileged = true` and `volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]`. An indicated location for the runner is `/etc/gitlab-runner`.
+3. Register a Gitlab Runner in a machine you wish to run it. Once again, you can follow the instructions provided in the [official Gitlab documentation](https://docs.gitlab.com/runner/register/). When prompted to insert image for the runner, insert `docker`.
+4. Grant elevated permissions to the runner by modifying the `config.toml` file and setting `privileged = true` and `volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]`. An indicated location for the runner is `/etc/
+-runner`.
 5. Install Docker and Docker Compose ([instructions here](https://docs.docker.com/engine/install/)) in that same machine, and set their permissions so that they can run without sudo command - so that they can be utilized by the CI pipeline on the runner.
 6. Start gitlab runner by running `sudo gitlab-runner start`.
 7. Setup a local docker network on your device, with the name "mynetwork". You can do so by running `docker network create mynetwork`. This is crucial, as otherwise your docker components will not be able to communicate each other.
 8. Important note: make sure that your local `mongodb` instance or any other local service does not run on the same port with the one the docker containers are setup to run, as you will end up having conflicts. By default, we have setup the port `3000` for our API app, and `27017` for our `mongodb` instance.
 9. You are all set! Commit to your repo and you should see the runner running your CI pipeline and the tests passing, upon successful installation.
+
+## Troubleshooting
+Here are some common issues that you might encounter with potential solution suggestions on how to resolve them on setup.
+These are indicative however, and you might need to search deeper on each issue.
+
+1. The project seems freeze upon start, not receiving any connections, and just giving me a warning.
+*Suggestion:* Make sure that `mongodb` service has started, and that the `.env` file you use is for local use and not CI. The default `.env` file is for CI use, so if you want to run and test your application locally, you need to rename `.env` (e.g., to `.env.ci`) and consecutively, also rename `.env.local` to `.env`. You can also setup `.gitignore` so that you don't push the local file to your repo as well. You can also determine which file is for which usage, by checking the `NOTE` field in each file.
+2. When running the project on GitLab CI, it tells me that address `3000`, `27017`, or any other, is in use.
+*Suggestion:* If you setup your runner in the same machine with your local development, make sure that the ports of the applications that you use locally do not interfere with the CI runs, as the runner essentially will run the tests on your machine.
+3. The CI gives me a 4XX error - e.g., 409.
+*Suggestion:* Clean your database using the script provided - your DB is left in an inconsistent state.
+4. The CI runner seems to be stuck.
+*Suggestion:* Check if an existing failing pipeline is still running and stop it. If the problem persists, attempt (1) to pause and resume the runner from Gitlab settings, (2) to remove and reinstall a new runner, following the instructions above. Make sure your runner is also up and running in the machine setting up.
+5. I receive lots of connection refused errors, towards MongoDB.
+*Suggestion:* Check if you have setup docker network.
+6. I cannot find the `config.toml` file.
+*Suggestion:* Given your configuration (e.g., if you installed the runner with `sudo`), locations might vary. Check [this SO question](https://stackoverflow.com/questions/72269656/gitlab-runner-configuration-not-showing-in-config-toml) for more info.
+7. My CI pipeline step seems to have failed.
+*Suggestion:* Using Gitlab CI pipeline interface, you can open the necessary step and read about the cause of failure.
+
+**Disclaimer: This software is provided "as-is", with no guarantees. The developer makes no other warranties, express or implied, and hereby disclaims all implied warranties, including any warranty of merchantability and warranty of fitness for a particular purpose. The project is provided for educational purposes, and are no guarantees of any kind  that it is fault-free, despite the best of efforts and intentions of its developer to provide a comprehensive and stable result.**
