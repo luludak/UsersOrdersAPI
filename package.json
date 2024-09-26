@@ -32,6 +32,7 @@
     "express": "^4.19.2",
     "express-flash": "latest",
     "express-jwt": "^8.4.1",
+    "jsonwebtoken": "latest",
     "express-session": "latest",
     "express-validator": "latest",
     "jest": "latest",
